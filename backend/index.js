@@ -44,7 +44,7 @@ app.use(function (req, res, next) {
     next();
 });
 
- app.post('/upload-image', upload.array('photos', 5), (req, res) => {
+ app.post('/upload-image', upload.array('images', 5), (req, res) => {
     res.status(200).send("Image uploaded successfully");
  });
  app.post('/download-image/:image(*)', (req, res) => {

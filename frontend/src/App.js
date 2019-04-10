@@ -11,13 +11,12 @@ import { withStyles } from '@material-ui/core/styles';
 const styles = {
   root: {
     width: '100%',
-    maxWidth: 500,
     marginLeft: 40
   },
 };
 
 const axios = require('axios');
-
+var imagesToUpload=[];
 class App extends Component {
   constructor(props)
   {
@@ -25,12 +24,14 @@ class App extends Component {
     this.state = {
         height: "",
         width: "",
-        selectedFile: null,
         resize:false,
         annotations: [],
         annotation: {},
+        uploaded:false,
+        multiple:false,
         imagePreview:'',
-        image:''
+        image:'',
+        imageNumber :0
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -42,14 +43,24 @@ class App extends Component {
       const name = target.name;
       const value = target.value;
       if (name === "imageToResize") {
-          console.log(target.files);
+
+          if(event.target.files.length>1)
+            this.setState({multiple:true})
+
+          for(let i=0;i<event.target.files.length;i++)
+              imagesToUpload.push(event.target.files[i]);
+
           var imageToResize = target.files[0];
+
           var data = new FormData();
-          data.append('photos', imageToResize);
+          for(let i=0;i<imagesToUpload.length;i++)
+            data.append('images', imagesToUpload[i]);
+
           axios.defaults.withCredentials = true;
           axios.post('/upload-image', data)
         .then(res => {
           if (res.status === 200) {
+            this.setState({uploaded:true})
               //Download image
             axios.post('/download-image/' + imageToResize.name)
                 .then(res => {
@@ -79,6 +90,54 @@ class App extends Component {
     this.setState({resize: true})
   }
 
+  handlePrevious= ()=>{
+    console.log(this.state.imageNumber)
+    if(this.state.imageNumber >0)
+    {
+      let imageno = this.state.imageNumber-1;
+      this.setState({imageNumber: imageno});
+      var imageToResize = imagesToUpload[this.state.imageNumber];
+      console.log(imageToResize);
+      axios.post('/download-image/' +imageToResize.name)
+      .then(res => {
+          let preview = 'data:image/jpg;base64, ' + res.data;
+          this.setState({
+              image: imageToResize.name,
+              imagePreview: preview
+          })
+      }).catch((err) =>{
+          if(err){
+              this.setState({
+                  errorRedirect: true
+              })
+          }
+      });
+    }
+  }
+
+  handleNext= ()=>{
+    if(this.state.imageNumber < 4)
+    {
+      let imageno = this.state.imageNumber+1;
+      this.setState({imageNumber: imageno});
+      var imageToResize = imagesToUpload[this.state.imageNumber];
+      console.log(imageToResize);
+      axios.post('/download-image/' +imageToResize.name)
+      .then(res => {
+          let preview = 'data:image/jpg;base64, ' + res.data;
+          this.setState({
+              image: imageToResize.name,
+              imagePreview: preview
+          })
+      }).catch((err) =>{
+          if(err){
+              this.setState({
+                  errorRedirect: true
+              })
+          }
+      });
+    }
+  }
   onChange = (annotation) => {
     this.setState({ annotation })
   }
@@ -114,11 +173,16 @@ class App extends Component {
         <Typography variant="title" style={{color: "#094D98"}} >
         1. Upload an image
         </Typography>
-        <input type="file" name="imageToResize" id="imageToResize" className="btn btn-lg photo-upload-btn" onChange={this.handleChange} className="btn btn-lg photo-upload-btn"  />
+        <input type="file" multiple name="imageToResize" id="imageToResize" className="btn btn-lg photo-upload-btn" onChange={this.handleChange} className="btn btn-lg photo-upload-btn"  />
         <div className="form-group">
         <label htmlFor="image"><strong>Upload a file </strong></label><br />
-        </div>
-        <div className="center-content profile-heading"> {imageToDisplay} </div>
+        </div>  
+        <div className="center-content profile-heading"> {imageToDisplay} </div> <br/>
+        {this.state.uploaded &&  this.state.multiple && 
+          <Button variant="secondary" style={{ marginLeft:0}} onClick={this.handlePrevious}>Previous</Button> }
+        {this.state.uploaded &&  this.state.multiple && 
+          <Button variant="secondary" style={{marginLeft:1200}} onClick={this.handleNext}>Next</Button> }
+        <br/><br/>
         <Typography variant="title" style={{color: "#094D98"}} >
         2. Resize your image
         </Typography>
@@ -130,7 +194,7 @@ class App extends Component {
         </div>
         <Button variant="primary" style={{width : 200, marginLeft:0}} onClick={this.handleSubmit}>Resize</Button>
         {this.state.resize && <Image src= {this.state.imagePreview}  height={this.state.height} width={this.state.width}/>}
-        {this.state.resize &&<Typography variant="title" style={{color: "#094D98"}} >
+        {this.state.resize &&<Typography variant="title" style={{color: "#094D98"}} ><br/>
         2. Annotate Your Image
         </Typography>}
         {this.state.resize &&<Annotation
