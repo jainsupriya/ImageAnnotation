@@ -1,15 +1,13 @@
 var express = require('express');
-var express = require('express');
-var app = express();
 var bodyParser = require('body-parser');
 var session = require('express-session');
-var app = express();
 var cors = require('cors');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var fs = require('fs-extra'); // import fs-extra package
-const { check, validationResult } = require('express-validator/check');
+
 const multer = require('multer');
+
 //Storing documents/Images
 const storage = multer.diskStorage({
    destination: (req, file, cb) => {
@@ -21,6 +19,8 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage });
+
+var app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true })); 
 app.use(cookieParser());
@@ -44,9 +44,20 @@ app.use(function (req, res, next) {
     next();
 });
 
-app.get('/', function(req, res){
-    res.send("Hello!");
+ app.post('/upload-image', upload.array('photos', 5), (req, res) => {
+    res.status(200).send("Image uploaded successfully");
  });
+ app.post('/download-image/:image(*)', (req, res) => {
+    var file = req.params.image;
+    var filelocation = path.join(__dirname + '/uploads', file);
+    var img = fs.readFileSync(filelocation);
+    var base64img = new Buffer(img).toString('base64');
+    res.writeHead(200, {
+        'Content--type': 'image/jpg'
+    });
+    res.end(base64img);
+ });
+ 
 
 app.listen(3001);
 module.exports = app
