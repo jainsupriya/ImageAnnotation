@@ -31,7 +31,8 @@ class App extends Component {
         multiple:false,
         imagePreview:'',
         image:'',
-        imageNumber :0
+        imageNumber :0,
+        annotationData :[],
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -155,6 +156,23 @@ class App extends Component {
         }
       })
     })
+    let tempdata = [...this.state.annotationData, data];
+    this.setState({ annotationData: tempdata});
+
+    var json = {
+      "image": this.state.image,
+      "annotation": this.state.annotationData
+    }
+    axios.post('/annotation' , json)
+    .then(res => {
+    console.log(res.data);
+    }).catch((err) =>{
+    if(err){
+    this.setState({
+    errorRedirect: true
+    })
+    }
+    });
     console.log(this.state.annotations)
     console.log(this.state.annotation)
   }

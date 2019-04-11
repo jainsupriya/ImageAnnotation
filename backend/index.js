@@ -59,5 +59,26 @@ app.use(function (req, res, next) {
  });
  
 
+
+
+app.post('/annotation', (req, res) => {
+
+    // parse json request
+    var newData = JSON.stringify(req.body)
+    var jsonObj = JSON.parse(newData);
+    console.log(jsonObj);
+    // stringify JSON Object
+    var jsonContent = JSON.stringify(jsonObj);
+    console.log(jsonContent);
+    var filename = (req.body.image.split("."))[0];
+    console.log(filename)
+    fs.writeFile("./annotedimages/"+filename+".json", jsonContent, 'utf8', function (err) {
+    if (err) {
+    console.log("An error occured while writing JSON Object to File.");
+    return console.log(err);
+    }
+    console.log("JSON file has been saved.");
+    });
+});
 app.listen(3001);
 module.exports = app
