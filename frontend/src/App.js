@@ -33,6 +33,8 @@ class App extends Component {
         image:'',
         imageNumber :0,
         annotationData :[],
+        resizedImage:'',
+        geometryData:[],
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -156,12 +158,17 @@ class App extends Component {
         }
       })
     })
-    let tempdata = [...this.state.annotationData, data];
+    var tdata= {
+      label: data,
+      geometry: geometry
+    }
+    let tempdata = [...this.state.annotationData, tdata];
     this.setState({ annotationData: tempdata});
 
     var json = {
       "image": this.state.image,
-      "annotation": this.state.annotationData
+      "annotations": this.state.annotationData,
+
     }
     axios.post('/annotation' , json)
     .then(res => {
@@ -183,7 +190,8 @@ class App extends Component {
     let imageToDisplay = <img src=""  />
     if (this.state.imagePreview) {
       imageToDisplay = <img src={this.state.imagePreview} alt="logo"/>
-  }
+    }
+
     return (
     
       <div  className={classes.root}>
@@ -212,14 +220,12 @@ class App extends Component {
         </div>
         <Button variant="primary" style={{width : 200, marginLeft:0}} onClick={this.handleSubmit}>Resize</Button>
         {this.state.resize && <Image src= {this.state.imagePreview}  height={this.state.height} width={this.state.width}/>}
-        {this.state.resize &&<Typography variant="title" style={{color: "#094D98"}} ><br/>
+        {this.state.resize &&<Typography variant="title" style={{color: "#094D98"}} ><br/><br/><br/><br/><br/><br/>
         2. Annotate Your Image
         </Typography>}
         {this.state.resize &&<Annotation
         src={this.state.imagePreview} 
         annotations={this.state.annotations}
-        height="50"
-        width="50"
         type={this.state.type}
         value={this.state.annotation}
         onChange={this.onChange}
