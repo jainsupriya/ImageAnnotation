@@ -95,6 +95,7 @@ class App extends Component {
 
   handlePrevious= ()=>{
     console.log(this.state.imageNumber)
+    console.log(this.state.imagesToUpload)
     if(this.state.imageNumber >0)
     {
       let imageno = this.state.imageNumber-1;
@@ -119,6 +120,7 @@ class App extends Component {
   }
 
   handleNext= ()=>{
+    console.log(this.state.imagesToUpload)
     if(this.state.imageNumber < 4)
     {
       let imageno = this.state.imageNumber+1;
@@ -188,8 +190,10 @@ class App extends Component {
   render() {
     const { classes } = this.props;
     let imageToDisplay = <img src=""  />
+    let resizedImage = <Image src= ""  height="" width=""/>
     if (this.state.imagePreview) {
       imageToDisplay = <img src={this.state.imagePreview} alt="logo"/>
+      resizedImage = <Image src= {this.state.imagePreview}  height={this.state.height} width={this.state.width} />
     }
 
     return (
@@ -203,14 +207,23 @@ class App extends Component {
         <div className="form-group">
         <label htmlFor="image"><strong>Upload a file </strong></label><br />
         </div>  
-        <div className="center-content profile-heading"> {imageToDisplay} </div> <br/>
+        <Annotation
+        src={this.state.imagePreview} 
+        annotations={this.state.annotations}
+        type={this.state.type}
+        height={this.state.height}
+        width={this.state.width}
+        value={this.state.annotation}
+        onChange={this.onChange}
+        onSubmit={this.onSubmit}
+        />
         {this.state.uploaded &&  this.state.multiple && 
           <Button variant="secondary" style={{ marginLeft:0}} onClick={this.handlePrevious}>Previous</Button> }
         {this.state.uploaded &&  this.state.multiple && 
           <Button variant="secondary" style={{marginLeft:1200}} onClick={this.handleNext}>Next</Button> }
         <br/><br/>
         <Typography variant="title" style={{color: "#094D98"}} >
-        2. Resize your image
+        3. Resize your image
         </Typography>
         <div className="form-group" style={{width : 200}}>
         Enter Height: <input type="text" className="form-control"  name="height" value={this.state.height} onChange={this.handleChange} placeholder="Height" />
@@ -219,18 +232,10 @@ class App extends Component {
         Enter Width : <input type="text" className="form-control"  name="width"  value={this.state.width} onChange={this.handleChange}  placeholder="Width" />
         </div>
         <Button variant="primary" style={{width : 200, marginLeft:0}} onClick={this.handleSubmit}>Resize</Button>
-        {this.state.resize && <Image src= {this.state.imagePreview}  height={this.state.height} width={this.state.width}/>}
-        {this.state.resize &&<Typography variant="title" style={{color: "#094D98"}} ><br/><br/><br/><br/><br/><br/>
-        2. Annotate Your Image
-        </Typography>}
-        {this.state.resize &&<Annotation
-        src={this.state.imagePreview} 
-        annotations={this.state.annotations}
-        type={this.state.type}
-        value={this.state.annotation}
-        onChange={this.onChange}
-        onSubmit={this.onSubmit}
-        />}
+        {this.state.resize &&<Image src= {this.state.imagePreview}  height={this.state.height} width={this.state.width} />}
+        {this.state.resize && <a href= {this.state.imagePreview} download> Download Image
+        <Image src= {this.state.imagePreview}  height={this.state.height} width={this.state.width} />
+        </a>}
       </div>
     );
   }
@@ -239,4 +244,3 @@ App.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 export default withStyles(styles)(App);
-
