@@ -107,7 +107,10 @@ class App extends Component {
           let preview = 'data:image/jpg;base64, ' + res.data;
           this.setState({
               image: imageToResize.name,
-              imagePreview: preview
+              imagePreview: preview,
+              annotations: [],
+              annotation: {},
+              resize:false,
           })
       }).catch((err) =>{
           if(err){
@@ -132,7 +135,10 @@ class App extends Component {
           let preview = 'data:image/jpg;base64, ' + res.data;
           this.setState({
               image: imageToResize.name,
-              imagePreview: preview
+              imagePreview: preview,
+              annotations: [],
+              annotation: {},
+              resize:false,
           })
       }).catch((err) =>{
           if(err){
@@ -170,7 +176,6 @@ class App extends Component {
     var json = {
       "image": this.state.image,
       "annotations": this.state.annotationData,
-
     }
     axios.post('/annotation' , json)
     .then(res => {
@@ -182,18 +187,14 @@ class App extends Component {
     })
     }
     });
-    console.log(this.state.annotations)
-    console.log(this.state.annotation)
   }
 
   
   render() {
     const { classes } = this.props;
     let imageToDisplay = <img src=""  />
-    let resizedImage = <Image src= ""  height="" width=""/>
     if (this.state.imagePreview) {
       imageToDisplay = <img src={this.state.imagePreview} alt="logo"/>
-      resizedImage = <Image src= {this.state.imagePreview}  height={this.state.height} width={this.state.width} />
     }
 
     return (
@@ -207,6 +208,9 @@ class App extends Component {
         <div className="form-group">
         <label htmlFor="image"><strong>Upload a file </strong></label><br />
         </div>  
+        <Typography variant="title" style={{color: "#094D98"}} >
+        2. Annotate your image
+        </Typography>
         <Annotation
         src={this.state.imagePreview} 
         annotations={this.state.annotations}
@@ -232,7 +236,6 @@ class App extends Component {
         Enter Width : <input type="text" className="form-control"  name="width"  value={this.state.width} onChange={this.handleChange}  placeholder="Width" />
         </div>
         <Button variant="primary" style={{width : 200, marginLeft:0}} onClick={this.handleSubmit}>Resize</Button>
-    
         {this.state.resize && <a href= {this.state.imagePreview} download> Download Image
         <Image src= {this.state.imagePreview}  height={this.state.height} width={this.state.width} />
         </a>}
@@ -245,4 +248,3 @@ App.propTypes = {
 };
 export default withStyles(styles)(App);
 
-//    {this.state.resize &&<Image src= {this.state.imagePreview}  height={this.state.height} width={this.state.width} />}
