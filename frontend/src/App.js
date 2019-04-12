@@ -232,7 +232,7 @@ class App extends Component {
         Enter Width : <input type="text" className="form-control"  name="width"  value={this.state.width} onChange={this.handleChange}  placeholder="Width" />
         </div>
         <Button variant="primary" style={{width : 200, marginLeft:0}} onClick={this.handleSubmit}>Resize</Button>
-        {this.state.resize &&<Image src= {this.state.imagePreview}  height={this.state.height} width={this.state.width} />}
+    
         {this.state.resize && <a href= {this.state.imagePreview} download> Download Image
         <Image src= {this.state.imagePreview}  height={this.state.height} width={this.state.width} />
         </a>}
@@ -244,3 +244,5 @@ App.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 export default withStyles(styles)(App);
+
+//    {this.state.resize &&<Image src= {this.state.imagePreview}  height={this.state.height} width={this.state.width} />}
