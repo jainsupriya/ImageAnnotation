@@ -44,9 +44,11 @@ app.use(function (req, res, next) {
     next();
 });
 
+//upload an image
  app.post('/upload-image', upload.array('images', 5), (req, res) => {
     res.status(200).send("Image uploaded successfully");
  });
+ //download image
  app.post('/download-image/:image(*)', (req, res) => {
     var file = req.params.image;
     var filelocation = path.join(__dirname + '/uploads', file);
@@ -57,27 +59,20 @@ app.use(function (req, res, next) {
     });
     res.end(base64img);
  });
- 
-
-
-
+ //save annotation text in json file
 app.post('/annotation', (req, res) => {
 
     // parse json request
     var newData = JSON.stringify(req.body)
     var jsonObj = JSON.parse(newData);
-    console.log(jsonObj);
     // stringify JSON Object
     var jsonContent = JSON.stringify(jsonObj);
-    console.log(jsonContent);
     var filename = (req.body.image.split("."))[0];
-    console.log(filename)
     fs.writeFile("./annotedimages/"+filename+".json", jsonContent, 'utf8', function (err) {
-    if (err) {
-    console.log("An error occured while writing JSON Object to File.");
-    return console.log(err);
-    }
-    console.log("JSON file has been saved.");
+    if (err) 
+        res.status(500).send('Error while saving annotations')
+    else
+        res.status(200).send('Annotations saved successfully')
     });
 });
 app.listen(3001);
